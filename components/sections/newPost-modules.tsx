@@ -13,6 +13,8 @@ import { Button } from "@/components/ui/button";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { useODB } from "@/app/context/OrbisContext";
 
+import { encryptWithTACo, decryptWithTACo } from "@/app/taco";
+
 const CONTEXT_ID = env.NEXT_PUBLIC_CONTEXT_ID ?? "";
 const POST_ID = env.NEXT_PUBLIC_POST_ID ?? "";
 const PROFILE_ID = env.NEXT_PUBLIC_PROFILE_ID ?? "";
@@ -70,12 +72,17 @@ export function PostModules() {
           imageUrl = await uploadToIpfs();
         }
 
+        // encrypt post with TACO
+        const encryptedBody = await encryptWithTACo(body);
+        console.log(encryptedBody);
+
+
         const created = new Date().toISOString();
         const createQuery = await orbis
           .insert(POST_ID)
           .value({
             title,
-            body,
+            encryptedBody,
             imageid: imageUrl ? imageUrl : "",
             created,
           })
