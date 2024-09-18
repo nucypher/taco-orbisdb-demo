@@ -13,10 +13,10 @@ const rpcCondition = new conditions.base.rpc.RpcCondition({
 
 export async function encryptWithTACo(
     messageToEncrypt: string,
-): Promise<ThresholdMessageKit> {
+): Promise<String> {
     await initialize();
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    return await encrypt(
+    const tmk = await encrypt(
       provider,
       domains.TESTNET,
       messageToEncrypt,
@@ -24,12 +24,14 @@ export async function encryptWithTACo(
       0,
       provider.getSigner(),
     );
+    return encodeB64(tmk.toBytes());
 }
 
 export async function decryptWithTACo(
     encryptedMessage: ThresholdMessageKit,
     conditionContext?: conditions.context.ConditionContext
 ): Promise<Uint8Array> {
+    await initialize();
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     return await decrypt(
         provider,
@@ -37,6 +39,14 @@ export async function decryptWithTACo(
         encryptedMessage,
         conditionContext,
     )
+}
+
+export function encodeB64(uint8Array: any) {
+    return Buffer.from(uint8Array).toString("base64");
+}
+  
+export function decodeB64(b64String: any) {
+    return new Uint8Array(Buffer.from(b64String, "base64"));
 }
 
 // export function parseUrsulaError(error: String): Array<String> {
