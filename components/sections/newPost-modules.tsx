@@ -74,7 +74,7 @@ export function PostModules() {
 
         // encrypt post with TACO
         const encryptedBody = await encryptWithTACo(body);
-        console.log(encryptedBody);
+        console.log("encryptedDoby", encryptedBody);
 
 
         const created = new Date().toISOString();
