@@ -1,4 +1,4 @@
-import {conditions, decrypt, domains, encrypt, ThresholdMessageKit} from '@nucypher/taco';
+import {conditions, decrypt, domains, encrypt, initialize, ThresholdMessageKit} from '@nucypher/taco';
 import {ethers} from "ethers";
 
 const rpcCondition = new conditions.base.rpc.RpcCondition({
@@ -14,8 +14,8 @@ const rpcCondition = new conditions.base.rpc.RpcCondition({
 export async function encryptWithTACo(
     messageToEncrypt: string,
 ): Promise<ThresholdMessageKit> {
+    await initialize();
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    console.log(window.ethereum);
     return await encrypt(
       provider,
       domains.TESTNET,
