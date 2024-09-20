@@ -74,16 +74,13 @@ export function PostModules() {
 
         // encrypt post with TACO
         const encryptedBody = await encryptWithTACo(body);
-        console.log("encryptedDoby", encryptedBody);
-        console.log("body", body);
-
 
         const created = new Date().toISOString();
         const createQuery = await orbis
           .insert(POST_ID)
           .value({
             title,
-            encryptedBody,
+            body: encryptedBody,
             imageid: imageUrl ? imageUrl : "",
             created,
           })

@@ -42,7 +42,7 @@ export async function decryptWithTACo(
 }
 
 export function encodeB64(uint8Array: any) {
-    return Buffer.from(uint8Array).toString("base64");
+    return Buffer.from(uint8Array).toString("base64") as String;
 }
   
 export function decodeB64(b64String: any) {
