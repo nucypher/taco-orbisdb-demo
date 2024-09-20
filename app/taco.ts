@@ -1,10 +1,11 @@
 import {conditions, decrypt, domains, encrypt, initialize, ThresholdMessageKit} from '@nucypher/taco';
+import { EIP4361AuthProvider, USER_ADDRESS_PARAM_DEFAULT } from '@nucypher/taco-auth';
 import {ethers} from "ethers";
 
 const rpcCondition = new conditions.base.rpc.RpcCondition({
     chain: 80002,
     method: 'eth_getBalance',
-    parameters: [':userAddressExternalEIP4361'],
+    parameters: [':userAddress'],
     returnValueTest: {
       comparator: '>',
       value: 0,
@@ -28,17 +29,31 @@ export async function encryptWithTACo(
 }
 
 export async function decryptWithTACo(
-    encryptedMessage: ThresholdMessageKit,
+    encryptedMessage: string,
     conditionContext?: conditions.context.ConditionContext
-): Promise<Uint8Array> {
-    await initialize();
-    const provider = new ethers.providers.Web3Provider(window.ethereum);
-    return await decrypt(
-        provider,
-        domains.TESTNET,
-        encryptedMessage,
-        conditionContext,
-    )
+): Promise<String> {
+    return initialize()
+    .then(() => {
+        const tmk = ThresholdMessageKit.fromBytes(decodeB64(encryptedMessage));
+        const conditionContext = conditions.context.ConditionContext.fromMessageKit(tmk);
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const authProvider = new EIP4361AuthProvider(
+            provider,
+            provider.getSigner(),
+        );
+        conditionContext.addAuthProvider(USER_ADDRESS_PARAM_DEFAULT, authProvider);
+        return decrypt(
+            provider,
+            domains.TESTNET,
+            tmk,
+            conditionContext
+        );
+    })
+    .then(decrypted => new TextDecoder().decode(decrypted))
+    .catch(error => {
+        console.error("Decryption failed:", error);
+        return encryptedMessage;
+    });
 }
 
 export function encodeB64(uint8Array: any) {
