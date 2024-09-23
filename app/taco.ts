@@ -2,6 +2,21 @@ import {conditions, decrypt, domains, encrypt, initialize, ThresholdMessageKit} 
 import { EIP4361AuthProvider, USER_ADDRESS_PARAM_DEFAULT } from '@nucypher/taco-auth';
 import {ethers} from "ethers";
 
+let globalAuthProvider: EIP4361AuthProvider | null = null;
+
+export async function initializeAuthProvider() {
+    if (!globalAuthProvider) {
+        await initialize();
+        const provider = new ethers.providers.Web3Provider(window.ethereum);
+        globalAuthProvider = new EIP4361AuthProvider(
+            provider,
+            provider.getSigner(),
+        );
+    }
+    return globalAuthProvider;
+}
+
+
 const rpcCondition = new conditions.base.rpc.RpcCondition({
     chain: 80002,
     method: 'eth_getBalance',
@@ -30,30 +45,31 @@ export async function encryptWithTACo(
 
 export async function decryptWithTACo(
     encryptedMessage: string,
-    conditionContext?: conditions.context.ConditionContext
+    authProvider?: EIP4361AuthProvider
 ): Promise<String> {
-    return initialize()
-    .then(() => {
+    try {
         const tmk = ThresholdMessageKit.fromBytes(decodeB64(encryptedMessage));
         const conditionContext = conditions.context.ConditionContext.fromMessageKit(tmk);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const authProvider = new EIP4361AuthProvider(
-            provider,
-            provider.getSigner(),
-        );
+        
+        if (!authProvider) {
+            authProvider = await initializeAuthProvider();
+        }
+        
         conditionContext.addAuthProvider(USER_ADDRESS_PARAM_DEFAULT, authProvider);
-        return decrypt(
+        
+        const decrypted = await decrypt(
             provider,
             domains.TESTNET,
             tmk,
             conditionContext
         );
-    })
-    .then(decrypted => new TextDecoder().decode(decrypted))
-    .catch(error => {
+        
+        return new TextDecoder().decode(decrypted);
+    } catch (error) {
         console.error("Decryption failed:", error);
         return encryptedMessage;
-    });
+    }
 }
 
 export function encodeB64(uint8Array: any) {
