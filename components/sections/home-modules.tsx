@@ -5,7 +5,6 @@ import { Profile } from "@/types";
 import { MediaRenderer } from "@thirdweb-dev/react";
 import { Oval } from "react-loader-spinner";
 import { useAccount } from "wagmi";
-
 import { env } from "@/env.mjs";
 import { Button } from "@/components/ui/button";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
@@ -16,7 +15,6 @@ const CONTEXT_ID = env.NEXT_PUBLIC_CONTEXT_ID ?? "";
 
 export function HomeModules() {
   const [profile, setProfile] = useState<Profile | undefined>(undefined);
-  const [connected, setConnected] = useState<boolean | null>(null);
   const { orbis } = useODB();
   const { address, isConnecting, isConnected } = useAccount();
 
@@ -50,7 +48,6 @@ export function HomeModules() {
     });
     void getProfile();
     if (!isConnected) {
-      setConnected(false);
       setProfile(undefined);
     }
   }, [address, isConnected]);
