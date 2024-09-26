@@ -77,10 +77,6 @@ Building:
 pnpm build
 ```
 
-## Credits
-
-This project was adapted from the [NextJS Saas Stripe Starter](https://github.com/mickasmt/next-saas-stripe-starter), created by [@miickasmt](https://twitter.com/miickasmt) in 2023, released under the [MIT license](https://github.com/shadcn/taxonomy/blob/main/LICENSE.md).
-
 ## Learn More
 To learn more about OrbisDB please visit the following links
 
