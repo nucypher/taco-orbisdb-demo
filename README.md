@@ -1,36 +1,89 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# DeForum - A Web Forum on OrbisDB
+
+A web forum demo application built on OrbisDB.
+
+![deforum screenshot](./public/forum.png)
+
+## Introduction
+
+This application emulates a web forum, complete with posts, comments, images, and personal profiles. It relies on the following items:
+
+**OrbisDB on Ceramic** - A decentralized database to hold the various forum artifacts users create (such as posts, comments, etc.)
+**ThirdWeb SDK** - Uses their IPFS upload feature for image file storage
+
+## Installation
+
+First, create a local clone of the application:
+
+```bash
+git clone https://github.com/ceramicstudio/deforum && cd deforum
+```
+
+Next, install your dependencies:
+
+```bash
+pnpm install
+```
+
+### Environment Setup
+
+You will need to create a copy of the example environment file:
+
+```bash
+cp .env.example .env.local
+```
+
+First, create a value for `AUTH_SECRET` (will be required if you ever decide to re-integrate some of the other services that rely on NextAuth):
+
+```bash
+openssl rand -base64 32
+```
+
+**ThirdWeb**
+
+Next, you will need a value for your `NEXT_PUBLIC_THIRDWEB_ID`. Log into your [ThirdWeb Dashboard](https://thirdweb.com/dashboard) and go to the "Settings" tab on the upper left-hand side. Create a new API key with "Storage" as an enabled service with read + write access. Once done, copy the "Client ID" and assign it to your env value.
+
+**WalletConnect**
+
+You will also need to obtain a Client ID from WalletConnect as the demo uses it for its wallet provider. Log into your [WalletConnect Cloud Dashboard](https://cloud.walletconnect.com/) and create a new project (with the "App" type selected). Once created, copy the "Project ID" and assign it to `NEXT_PUBLIC_PROJECT_ID`.
+
+**OrbisDB**
+
+The next few values will be associated with OrbisDB. To make things simple, we will use the hosted [OrbisDB Studio](https://studio.useorbis.com/) and the shared node instance it provides for this demo, but keep in mind that you can set up your own instance whenever you want (more details at [OrbisDB](https://useorbis.com/)).
+
+First, go ahead and sign in with your wallet.
+
+Once signed in, the studio will default to the "Contexts" tab at the top. On the right-hand side you will see your environment ID. Go ahead and assign that value to `ENV_ID` in your new .env file.
+
+Next, set up a context. These help developers segment their data models and usage based on the applications they are meant for. Create a new context (you can call it "forum-app" if you'd like), and assign the resulting string to `CONTEXT_ID` in your .env file.
+
+Finally, you will create three tables using the OrbisDB model builder feature that this application will use for storing user data. 
+
+In your Orbis Studio view, select the "Model Builder" tab at the top and create a new model named "profile" using the profile definition in [this document](models/tables.sql). Once created, assign the resulting identifier to `NEXT_PUBLIC_PROFILE_ID`. Do the same for comment --> `NEXT_PUBLIC_COMMENT_ID` and post --> `NEXT_PUBLIC_POST_ID`.
 
 ## Getting Started
 
-First, run the development server:
+You are now ready to run the application.
+
+Running in developer mode:
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
 pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Building:
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+pnpm build
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+## Credits
+
+This project was adapted from the [NextJS Saas Stripe Starter](https://github.com/mickasmt/next-saas-stripe-starter), created by [@miickasmt](https://twitter.com/miickasmt) in 2023, released under the [MIT license](https://github.com/shadcn/taxonomy/blob/main/LICENSE.md).
 
 ## Learn More
+To learn more about OrbisDB please visit the following links
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+[OrbisDB Overview](https://developers.ceramic.network/docs/orbisdb/overview)
+[OrbisDB SDK](https://developers.ceramic.network/docs/orbisdb/orbisdb-sdk)
+[OrbisDB Website](https://useorbis.com/)
