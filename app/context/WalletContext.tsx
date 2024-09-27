@@ -5,7 +5,7 @@ import {
   darkTheme,
 } from '@rainbow-me/rainbowkit';
 import { WagmiProvider } from 'wagmi';
-import { polygonAmoy } from 'wagmi/chains';
+import { polygonAmoy, sepolia } from 'wagmi/chains';
 import React, { ReactNode } from 'react';
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || "";
@@ -13,7 +13,7 @@ const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || "";
 const config = getDefaultConfig({
   appName: "test-app",
   projectId,
-  chains: [polygonAmoy],
+  chains: [polygonAmoy, sepolia],
   ssr: true,
 });
 
