@@ -6,7 +6,7 @@ import {
 } from "@rainbow-me/rainbowkit";
 import { env } from "@/env.mjs";
 import { WagmiProvider } from "wagmi";
-import { polygonAmoy } from "wagmi/chains";
+import { polygonAmoy, sepolia } from "wagmi/chains";
 import React, { ReactNode } from "react";
 
 const projectId = env.NEXT_PUBLIC_PROJECT_ID || "";
@@ -14,7 +14,7 @@ const projectId = env.NEXT_PUBLIC_PROJECT_ID || "";
 const config = getDefaultConfig({
   appName: "test-app",
   projectId,
-  chains: [polygonAmoy],
+  chains: [polygonAmoy, sepolia],
   ssr: true,
 });
 

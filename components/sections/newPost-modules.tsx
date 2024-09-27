@@ -13,7 +13,7 @@ import { Button } from "@/components/ui/button";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { useODB } from "@/app/context/OrbisContext";
 
-import { encryptWithTACo, decryptWithTACo } from "@/app/taco";
+import { encryptWithTACo } from "@/app/taco";
 
 const CONTEXT_ID = env.NEXT_PUBLIC_CONTEXT_ID ?? "";
 const POST_ID = env.NEXT_PUBLIC_POST_ID ?? "";

@@ -11,7 +11,6 @@ import { Icons } from "@/components/shared/icons";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { useODB } from "@/app/context/OrbisContext";
 import { decryptWithTACo, initializeAuthProvider } from "@/app/taco";
-import { EIP4361AuthProvider } from '@nucypher/taco-auth';
 
 
 export default function Posts() {
@@ -20,15 +19,7 @@ export default function Posts() {
   const { orbis } = useODB();
   const [pagination, setPagination] = useState<number>(1);
   const [decryptedBodies, setDecryptedBodies] = useState<{[key: string]: string}>({});
-  const [authProvider, setAuthProvider] = useState<EIP4361AuthProvider | null>(null);
-
-  useEffect(() => {
-    const initAuth = async () => {
-      const provider = await initializeAuthProvider();
-      setAuthProvider(provider);
-    };
-    initAuth();
-  }, []);
+  const _ = initializeAuthProvider();
 
 
   const getPosts = async (): Promise<void> => {
@@ -86,15 +77,15 @@ export default function Posts() {
   };
 
   useEffect(() => {
-    if (posts && authProvider) {
+    if (posts) {
       posts.forEach(post => {
-        decryptWithTACo(post.body, authProvider)
+        decryptWithTACo(post.body)
           .then(decryptedBody => {
             setDecryptedBodies(prev => ({...prev, [post.stream_id]: decryptedBody.toString()}));
           });
       });
     }
-  }, [posts, authProvider]);
+  }, [posts]);
 
   useEffect(() => {
     window.addEventListener("loaded", function () {

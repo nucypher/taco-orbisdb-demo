@@ -3,19 +3,33 @@ import { EIP4361AuthProvider, USER_ADDRESS_PARAM_DEFAULT } from '@nucypher/taco-
 import {ethers} from "ethers";
 
 let globalAuthProvider: EIP4361AuthProvider | null = null;
+let currentAccount: string | null = null;
 
 export async function initializeAuthProvider() {
+    await initialize();
     if (!globalAuthProvider) {
-        await initialize();
         const provider = new ethers.providers.Web3Provider(window.ethereum);
+        const accounts = await provider.listAccounts();
+        const newAccount = accounts[0];
         globalAuthProvider = new EIP4361AuthProvider(
             provider,
             provider.getSigner(),
         );
+        currentAccount = newAccount;
     }
+
+    // Set up account change listener
+    window.ethereum.on('accountsChanged', handleAccountChange);
     return globalAuthProvider;
 }
 
+async function handleAccountChange(accounts: string[]) {
+    const newAccount = accounts[0];
+    if (newAccount !== currentAccount) {
+        globalAuthProvider = null;
+        await initializeAuthProvider();
+    }
+}
 
 const rpcCondition = new conditions.base.rpc.RpcCondition({
     chain: 80002,
@@ -43,19 +57,15 @@ export async function encryptWithTACo(
     return encodeB64(tmk.toBytes());
 }
 
-export async function decryptWithTACo(
-    encryptedMessage: string,
-    authProvider?: EIP4361AuthProvider
-): Promise<String> {
+export async function decryptWithTACo(encryptedMessage: string): Promise<String> {
     try {
         const tmk = ThresholdMessageKit.fromBytes(decodeB64(encryptedMessage));
         const conditionContext = conditions.context.ConditionContext.fromMessageKit(tmk);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         
-        if (!authProvider) {
-            authProvider = await initializeAuthProvider();
-        }
-        
+        const authProvider = await initializeAuthProvider();
+        console.log(authProvider);
+
         conditionContext.addAuthProvider(USER_ADDRESS_PARAM_DEFAULT, authProvider);
         
         const decrypted = await decrypt(
@@ -79,21 +89,3 @@ export function encodeB64(uint8Array: any) {
 export function decodeB64(b64String: any) {
     return new Uint8Array(Buffer.from(b64String, "base64"));
 }
-
-// export function parseUrsulaError(error: String): Array<String> {
-//     const jsonLike = error.split('TACo decryption failed with errors:')[1].trim();
-
-//     // Escape double quotes inside the error message strings
-//     const escaped = jsonLike.replace(/ThresholdDecryptionRequestFailed\('(.*?)'\)/g, 'ThresholdDecryptionRequestFailed(\\"$1\\")');
-
-//     // Parse the escaped string as JSON
-//     const errors = JSON.parse(escaped);
-
-//     // Extract the specific part of the error messages
-//     const errorParts = Object.values(errors).map(error => {
-//         const match = error.match(/Node (.*?) raised (.*?)(?=\")/);
-//         return match ? match[2] : null; // match[2] contains the error type
-//     });
-
-//     return [...new Set(errorParts.filter(Boolean))];
-// }
