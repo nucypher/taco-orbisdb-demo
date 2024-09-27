@@ -1,8 +1,6 @@
 # DeForum - A Web Forum on OrbisDB
 
-A web forum demo application built on OrbisDB.
-
-![deforum screenshot](./public/forum.png)
+A web forum demo application built on OrbisDB and utilising TACo for encrypting posts and managing who has access to them.
 
 ## Introduction
 
@@ -16,7 +14,7 @@ This application emulates a web forum, complete with posts, comments, images, an
 First, create a local clone of the application:
 
 ```bash
-git clone https://github.com/ceramicstudio/deforum && cd deforum
+git clone https://github.com/nucypher/orbis-demo && cd deforum
 ```
 
 Next, install your dependencies:
