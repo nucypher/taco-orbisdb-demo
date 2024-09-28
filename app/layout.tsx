@@ -34,25 +34,27 @@ export default function RootLayout({ children }: RootLayoutProps) {
           fontGeist.variable,
         )}
       >
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="system"
-            enableSystem
-            disableTransitionOnChange
-          >
-            <QueryClientProvider client={queryClient}>
-              <WalletProvider>
-                <ODB>
-                <ThirdwebProvider activeChain="ethereum" clientId={env.NEXT_PUBLIC_THIRDWEB_ID}>
-               {children}
-                  </ThirdwebProvider>
-                </ODB>
-               
-              </WalletProvider>
-            </QueryClientProvider>
-            <Toaster richColors closeButton />
-            <TailwindIndicator />
-          </ThemeProvider>
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          <QueryClientProvider client={queryClient}>
+            <WalletProvider>
+              <ODB>
+                <ThirdwebProvider
+                  activeChain="ethereum"
+                  clientId={env.NEXT_PUBLIC_THIRDWEB_ID}
+                >
+                  {children}
+                </ThirdwebProvider>
+              </ODB>
+            </WalletProvider>
+          </QueryClientProvider>
+          <Toaster richColors closeButton />
+          <TailwindIndicator />
+        </ThemeProvider>
       </body>
     </html>
   );

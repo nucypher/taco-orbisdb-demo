@@ -5,8 +5,7 @@ const site_url = env.NEXT_PUBLIC_APP_URL ?? "http://localhost:3000";
 
 export const siteConfig: SiteConfig = {
   name: "DeForum",
-  description:
-    "",
+  description: "",
   url: site_url,
   ogImage: `${site_url}/ceramic-favicon.svg`,
   links: {

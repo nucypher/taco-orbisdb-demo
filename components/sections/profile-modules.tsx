@@ -81,7 +81,7 @@ export function ProfileModules() {
   const getProfile = async (): Promise<void> => {
     try {
       const user = await orbis.getConnectedUser();
-      console.log(orbis)
+      console.log(orbis);
       if (user) {
         const profile = orbis
           .select("name", "username", "profile_imageid", "description")

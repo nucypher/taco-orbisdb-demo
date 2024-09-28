@@ -49,12 +49,12 @@ export const ODB = ({ children }: OrbisDBProps) => {
   function StartAuth() {
     const { data: walletClient } = useWalletClient();
     const [isAuth, setAuth] = useState(false);
-    const {address} = useAccount();
+    const { address } = useAccount();
     useAccountEffect({
       onDisconnect() {
         localStorage.removeItem("orbis:session");
       },
-    })
+    });
     useEffect(() => {
       const StartOrbisAuth = async (): Promise<
         OrbisConnectResult | undefined
@@ -118,7 +118,7 @@ export const ODB = ({ children }: OrbisDBProps) => {
 
   if (!isAuthenticated) {
     StartAuth();
-  } 
+  }
 
   return (
     <Context.Provider value={{ orbis, isAuthenticated }}>

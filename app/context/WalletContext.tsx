@@ -1,17 +1,17 @@
-import '@rainbow-me/rainbowkit/styles.css';
+import "@rainbow-me/rainbowkit/styles.css";
 import {
   getDefaultConfig,
   RainbowKitProvider,
   darkTheme,
-} from '@rainbow-me/rainbowkit';
-import { WagmiProvider } from 'wagmi';
-import { mainnet } from 'wagmi/chains';
-import React, { ReactNode } from 'react';
+} from "@rainbow-me/rainbowkit";
+import { WagmiProvider } from "wagmi";
+import { mainnet } from "wagmi/chains";
+import React, { ReactNode } from "react";
 
-const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || '';
+const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || "";
 
 const config = getDefaultConfig({
-  appName: 'test-app',
+  appName: "test-app",
   projectId,
   chains: [mainnet],
   ssr: true,
