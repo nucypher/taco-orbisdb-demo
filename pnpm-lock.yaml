@@ -149,6 +149,9 @@ dependencies:
   lucide-react:
     specifier: ^0.381.0
     version: 0.381.0(react@18.3.1)
+  ms:
+    specifier: ^2.1.3
+    version: 2.1.3
   next:
     specifier: 14.2.11
     version: 14.2.11(@babel/core@7.25.2)(react-dom@18.3.1)(react@18.3.1)
@@ -158,6 +161,9 @@ dependencies:
   next-themes:
     specifier: ^0.3.0
     version: 0.3.0(react-dom@18.3.1)(react@18.3.1)
+  postcss-load-config:
+    specifier: ^6.0.1
+    version: 6.0.1(postcss@8.4.47)
   prettier:
     specifier: ^3.3.2
     version: 3.3.3
@@ -14564,6 +14570,28 @@ packages:
       lilconfig: 3.1.2
       postcss: 8.4.47
       yaml: 2.5.1
+
+  /postcss-load-config@6.0.1(postcss@8.4.47):
+    resolution: {integrity: sha512-oPtTM4oerL+UXmx+93ytZVN82RrlY/wPUV8IeDxFrzIjXOLF1pN+EmKPLbubvKHT2HC20xXsCAH2Z+CKV6Oz/g==}
+    engines: {node: '>= 18'}
+    peerDependencies:
+      jiti: '>=1.21.0'
+      postcss: '>=8.0.9'
+      tsx: ^4.8.1
+      yaml: ^2.4.2
+    peerDependenciesMeta:
+      jiti:
+        optional: true
+      postcss:
+        optional: true
+      tsx:
+        optional: true
+      yaml:
+        optional: true
+    dependencies:
+      lilconfig: 3.1.2
+      postcss: 8.4.47
+    dev: false
 
   /postcss-nested@6.2.0(postcss@8.4.47):
     resolution: {integrity: sha512-HQbt28KulC5AJzG+cZtj9kvKB93CFCdLvog1WFLf1D+xmMvPGlBstkpTEZfK5+AN9hfJocyBFCNiqyS48bpgzQ==}
