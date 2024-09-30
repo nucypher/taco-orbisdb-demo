@@ -15,7 +15,7 @@ This application emulates a web forum, complete with posts, comments, images, an
 First, create a local clone of the application:
 
 ```bash
-git clone https://github.com/nucypher/orbis-demo && cd deforum
+git clone https://github.com/nucypher/orbis-demo && cd orbis-demo
 ```
 
 Next, install your dependencies:
