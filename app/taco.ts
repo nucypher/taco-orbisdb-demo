@@ -1,4 +1,4 @@
-import {conditions, decrypt, domains, encrypt, initialize, ThresholdMessageKit} from '@nucypher/taco';
+import {conditions, decrypt, domains, encrypt, ThresholdMessageKit} from '@nucypher/taco';
 import { EIP4361AuthProvider, USER_ADDRESS_PARAM_DEFAULT } from '@nucypher/taco-auth';
 import {ethers} from "ethers";
 
@@ -6,7 +6,6 @@ let globalAuthProvider: EIP4361AuthProvider | null = null;
 let currentAccount: string | null = null;
 
 export async function initializeAuthProvider() {
-    await initialize();
     if (!globalAuthProvider) {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const accounts = await provider.listAccounts();
@@ -44,7 +43,6 @@ const rpcCondition = new conditions.base.rpc.RpcCondition({
 export async function encryptWithTACo(
     messageToEncrypt: string,
 ): Promise<String> {
-    await initialize();
     const provider = new ethers.providers.Web3Provider(window.ethereum);
     const tmk = await encrypt(
       provider,

@@ -55,7 +55,6 @@ export default function PostPage({
         if (commentFile) {
           imageUrl = await uploadToIpfs();
         }
-        // encrypt comment with TACO
         const created = new Date().toISOString();
         const updatequery = await orbis
           .insert(COMMENT_ID)

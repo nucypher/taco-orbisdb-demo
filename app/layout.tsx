@@ -11,7 +11,8 @@ import { TailwindIndicator } from "@/components/tailwind-indicator";
 import { env } from "@/env.mjs";
 import { ODB } from "./context/OrbisContext";
 import { WalletProvider } from "./context/WalletContext";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { initialize } from '@nucypher/taco';
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -24,6 +25,10 @@ export const useQueryClient = () => {
 
 export default function RootLayout({ children }: RootLayoutProps) {
   const queryClient = useQueryClient();
+  useEffect(() => {
+    initialize();
+  }, []);
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
