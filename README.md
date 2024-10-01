@@ -7,7 +7,7 @@ A web forum demo application built on OrbisDB and utilising TACo for encrypting 
 This application emulates a web forum, complete with posts, comments, images, and personal profiles. It relies on the following items:
 
 **OrbisDB on Ceramic** - A decentralized database to hold the various forum artifacts users create (such as posts, comments, etc.)
-**TACo** - A protocol to encrypt and decrypt data based on on-chain condition logic.
+**TACo** - A protocol for secure, end-to-end encrypted data sharing and communication, enabling encryption and decryption of data based on access control logic.
 **ThirdWeb SDK** - Uses their IPFS upload feature for image file storage
 
 ## Installation
