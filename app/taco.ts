@@ -2,34 +2,42 @@ import {conditions, decrypt, domains, encrypt, ThresholdMessageKit} from '@nucyp
 import { EIP4361AuthProvider, USER_ADDRESS_PARAM_DEFAULT } from '@nucypher/taco-auth';
 import {ethers} from "ethers";
 
-let globalAuthProvider: EIP4361AuthProvider | null = null;
-let currentAccount: string | null = null;
+let authManager = {
+    provider: null,
+    authProvider: null,
+    currentAccount: null,
 
-export async function initializeAuthProvider() {
-    if (!globalAuthProvider) {
-        const provider = new ethers.providers.Web3Provider(window.ethereum);
-        const accounts = await provider.listAccounts();
+    async initialize() {
+      if (!this.provider) {
+        this.provider = new ethers.providers.Web3Provider(window.ethereum);
+        await this.updateAccount();
+        this.setupAccountChangeListener();
+      }
+      return this.authProvider;
+    },
+
+    async updateAccount() {
+      const accounts = await this.provider.listAccounts();
+      this.currentAccount = accounts[0];
+      this.authProvider = new EIP4361AuthProvider(
+        this.provider,
+        this.provider.getSigner()
+      );
+    },
+
+    setupAccountChangeListener() {
+      window.ethereum.on('accountsChanged', async (accounts) => {
         const newAccount = accounts[0];
-        globalAuthProvider = new EIP4361AuthProvider(
-            provider,
-            provider.getSigner(),
-        );
-        currentAccount = newAccount;
+        if (newAccount !== this.currentAccount) {
+          await this.updateAccount();
+        }
+      });
     }
+};
 
-    // Set up account change listener
-    window.ethereum.on('accountsChanged', handleAccountChange);
-    return globalAuthProvider;
+export async function getAuthProvider() {
+    return authManager.initialize();
 }
-
-async function handleAccountChange(accounts: string[]) {
-    const newAccount = accounts[0];
-    if (newAccount !== currentAccount) {
-        globalAuthProvider = null;
-        await initializeAuthProvider();
-    }
-}
-
 const rpcCondition = new conditions.base.rpc.RpcCondition({
     chain: 80002,
     method: 'eth_getBalance',
@@ -61,7 +69,7 @@ export async function decryptWithTACo(encryptedMessage: string): Promise<String>
         const conditionContext = conditions.context.ConditionContext.fromMessageKit(tmk);
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         
-        const authProvider = await initializeAuthProvider();
+        const authProvider = await getAuthProvider();
         console.log(authProvider);
 
         conditionContext.addAuthProvider(USER_ADDRESS_PARAM_DEFAULT, authProvider);

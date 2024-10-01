@@ -10,7 +10,7 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/shared/icons";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { useODB } from "@/app/context/OrbisContext";
-import { decryptWithTACo, initializeAuthProvider } from "@/app/taco";
+import { decryptWithTACo, getAuthProvider } from "@/app/taco";
 
 
 export default function Posts() {
@@ -19,7 +19,7 @@ export default function Posts() {
   const { orbis } = useODB();
   const [pagination, setPagination] = useState<number>(1);
   const [decryptedBodies, setDecryptedBodies] = useState<{[key: string]: string}>({});
-  const _ = initializeAuthProvider();
+  const _ = getAuthProvider();
 
 
   const getPosts = async (): Promise<void> => {
