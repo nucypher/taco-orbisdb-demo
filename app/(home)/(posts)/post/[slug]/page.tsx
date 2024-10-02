@@ -16,6 +16,7 @@ import { env } from "@/env.mjs";
 import { formatDate } from "@/lib/utils";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { useODB } from "@/app/context/OrbisContext";
+import { decryptWithTACo } from "@/app/taco";
 
 const CONTEXT_ID = env.NEXT_PUBLIC_CONTEXT_ID ?? "";
 const COMMENT_ID = env.NEXT_PUBLIC_COMMENT_ID ?? "";
@@ -28,6 +29,7 @@ export default function PostPage({
   };
 }) {
   const [message, setMessage] = useState<Post | undefined>(undefined);
+  const [decryptedBody, setDecryptedBody] = useState<string | undefined>(undefined);
   const { orbis } = useODB();
   const { mutateAsync: upload } = useStorageUpload();
   const [poststream, setPostStream] = useState<string | undefined>(undefined);
@@ -117,6 +119,7 @@ export default function PostPage({
         const postResult = query.rows as Post[];
         if (postResult.length) {
           setMessage(postResult[0]);
+          decryptWithTACo(postResult[0].body).then(decrypted => setDecryptedBody(decrypted.toString()))
         }
       }
     } catch (error) {
@@ -168,7 +171,7 @@ export default function PostPage({
               </div>
             )}
             <p className="text-base text-muted-foreground md:text-lg">
-              {message.body}
+              {decryptedBody || message.body}
             </p>
             <div className="mt-12 grid gap-5 bg-inherit lg:grid-cols-1">
               <div className="relative flex w-full items-center justify-center">
