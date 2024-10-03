@@ -6,7 +6,6 @@ export const env = createEnv({
     // This is optional because it's only used in development.
     // See https://next-auth.js.org/deployment.
     NEXTAUTH_URL: z.string().url().optional(),
-    AUTH_SECRET: z.string().min(1),
   },
   client: {
     NEXT_PUBLIC_PROJECT_ID: z.string().min(1),
@@ -21,7 +20,6 @@ export const env = createEnv({
   },
   runtimeEnv: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
-    AUTH_SECRET: process.env.AUTH_SECRET,
     NEXT_PUBLIC_THIRDWEB_ID: process.env.NEXT_PUBLIC_THIRDWEB_ID,
     NEXT_PUBLIC_POST_ID: process.env.NEXT_PUBLIC_POST_ID,
     NEXT_PUBLIC_COMMENT_ID: process.env.NEXT_PUBLIC_COMMENT_ID,

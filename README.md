@@ -33,12 +33,6 @@ You will need to create a copy of the example environment file:
 cp .env.example .env.local
 ```
 
-First, create a value for `AUTH_SECRET` (will be required if you ever decide to re-integrate some of the other services that rely on NextAuth):
-
-```bash
-openssl rand -base64 32
-```
-
 **ThirdWeb**
 
 Next, you will need a value for your `NEXT_PUBLIC_THIRDWEB_ID`. Log into your [ThirdWeb Dashboard](https://thirdweb.com/dashboard) and go to the "Settings" tab on the upper left-hand side. Create a new API key with "Storage" as an enabled service with read + write access. Once done, copy the "Client ID" and assign it to your env value.
