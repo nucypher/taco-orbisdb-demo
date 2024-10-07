@@ -3,10 +3,10 @@ import {
   getDefaultConfig,
   RainbowKitProvider,
   darkTheme,
-} from '@rainbow-me/rainbowkit';
-import { WagmiProvider } from 'wagmi';
-import { polygonAmoy, sepolia } from 'wagmi/chains';
-import React, { ReactNode } from 'react';
+} from "@rainbow-me/rainbowkit";
+import { WagmiProvider } from "wagmi";
+import { polygonAmoy, sepolia } from "wagmi/chains";
+import React, { ReactNode } from "react";
 
 const projectId = process.env.NEXT_PUBLIC_PROJECT_ID || "";
 
