@@ -12,6 +12,7 @@ import { env } from "@/env.mjs";
 import { ODB } from "./context/OrbisContext";
 import { WalletProvider } from "./context/WalletContext";
 import { ThirdwebProvider } from "@thirdweb-dev/react";
+import { TACoContextProvider } from "./context/TACoContext";
 
 interface RootLayoutProps {
   children: React.ReactNode;
@@ -21,14 +22,7 @@ const queryClient = new QueryClient();
 
 // export const metadata = constructMetadata();
 
-import { useEffect } from "react";
-import { initialize } from "@nucypher/taco";
-
 export default function RootLayout({ children }: RootLayoutProps) {
-  useEffect(() => {
-    initialize();
-  }, []);
-
   return (
     <html lang="en" suppressHydrationWarning>
       <head />
@@ -54,7 +48,9 @@ export default function RootLayout({ children }: RootLayoutProps) {
                   activeChain="ethereum"
                   clientId={env.NEXT_PUBLIC_THIRDWEB_ID}
                 >
-                  {children}
+                  <TACoContextProvider>
+                    {children}
+                  </TACoContextProvider>
                 </ThirdwebProvider>
               </ODB>
             </WalletProvider>
