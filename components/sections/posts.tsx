@@ -10,12 +10,17 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/shared/icons";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { useODB } from "@/app/context/OrbisContext";
+import { decryptWithTACo, getAuthProvider } from "@/app/taco";
 
 export default function Posts() {
   const [allMessages, setAllMessages] = useState<Post[] | undefined>(undefined);
   const [posts, setPosts] = useState<Post[] | undefined>();
   const { orbis } = useODB();
   const [pagination, setPagination] = useState<number>(1);
+  const [decryptedBodies, setDecryptedBodies] = useState<{
+    [key: string]: string;
+  }>({});
+  const _ = getAuthProvider();
 
   const getPosts = async (): Promise<void> => {
     try {
@@ -25,7 +30,7 @@ export default function Posts() {
           .select()
           .raw(
             `SELECT
-              *,  
+              *,
                 (
                   SELECT json_build_object( 'name', name, 'username', username, 'description', description, 'profile_imageid', profile_imageid, 'stream_id', stream_id)
                   FROM ${env.NEXT_PUBLIC_PROFILE_ID} as profile
@@ -70,6 +75,19 @@ export default function Posts() {
       console.error(error);
     }
   };
+
+  useEffect(() => {
+    if (posts) {
+      posts.forEach((post) => {
+        decryptWithTACo(post.body).then((decryptedBody) => {
+          setDecryptedBodies((prev) => ({
+            ...prev,
+            [post.stream_id]: decryptedBody.toString(),
+          }));
+        });
+      });
+    }
+  }, [posts]);
 
   useEffect(() => {
     window.addEventListener("loaded", function () {
@@ -140,7 +158,7 @@ export default function Posts() {
                           </div>
                         )}
                         <p className="relative mt-6 pb-6 text-muted-foreground">
-                          {post.body}
+                          {decryptedBodies[post.stream_id] || post.body}
                         </p>
                       </div>
                       <div className="relative -mb-5 flex gap-3 border-t border-muted py-4 md:-mb-7">
