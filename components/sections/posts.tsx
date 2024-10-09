@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { ethers } from "ethers";
 import { type Post } from "@/types";
 import { MediaRenderer } from "@thirdweb-dev/react";
 import { formatDate } from "@/lib/utils";
@@ -10,7 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Icons } from "@/components/shared/icons";
 import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { useODB } from "@/app/context/OrbisContext";
-import { decryptWithTACo, getAuthProvider } from "@/app/taco";
+import useTaco from "@/app/hooks/useTaco";
 
 export default function Posts() {
   const [allMessages, setAllMessages] = useState<Post[] | undefined>(undefined);
@@ -20,9 +21,16 @@ export default function Posts() {
   const [decryptedBodies, setDecryptedBodies] = useState<{
     [key: string]: string;
   }>({});
-  const _ = getAuthProvider();
+
+  const { isInitialized, decryptWithTACo } = useTaco();
 
   const getPosts = async (): Promise<void> => {
+    if (!window.ethereum) {
+      console.error("No Ethereum provider found");
+      return;
+    }
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
     try {
       const user = await orbis.getConnectedUser();
       if (user) {
@@ -42,6 +50,23 @@ export default function Posts() {
           .run();
         const queryResult = query.rows as Post[];
         if (queryResult.length) {
+          // Decrypting posts with TACo
+          queryResult.forEach((post) => {
+            decryptWithTACo(post.body, provider, signer).then(
+              (decryptedBody) => {
+                console.log("Then reached!");
+                console.log(decryptedBody);
+                console.log(decryptedBodies);
+                if (decryptedBody) {
+                  setDecryptedBodies((prev) => ({
+                    ...prev,
+                    [post.stream_id]: decryptedBody.toString(),
+                  }));
+                }
+              },
+            );
+          });
+
           setPosts(queryResult.slice(0, 10));
           setAllMessages(queryResult);
         }
@@ -77,19 +102,6 @@ export default function Posts() {
   };
 
   useEffect(() => {
-    if (posts) {
-      posts.forEach((post) => {
-        decryptWithTACo(post.body).then((decryptedBody) => {
-          setDecryptedBodies((prev) => ({
-            ...prev,
-            [post.stream_id]: decryptedBody.toString(),
-          }));
-        });
-      });
-    }
-  }, [posts]);
-
-  useEffect(() => {
     window.addEventListener("loaded", function () {
       try {
         void getPosts();
@@ -102,7 +114,7 @@ export default function Posts() {
       setAllMessages([]);
       setPosts([]);
     };
-  }, []);
+  }, [isInitialized]);
 
   return (
     <section className="col-span-2">
