@@ -22,7 +22,7 @@ const queryClient = new QueryClient();
 // export const metadata = constructMetadata();
 
 import { useEffect } from "react";
-import { initialize } from '@nucypher/taco';
+import { initialize } from "@nucypher/taco";
 
 export default function RootLayout({ children }: RootLayoutProps) {
   useEffect(() => {

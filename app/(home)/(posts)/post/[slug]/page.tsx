@@ -29,7 +29,9 @@ export default function PostPage({
   };
 }) {
   const [message, setMessage] = useState<Post | undefined>(undefined);
-  const [decryptedBody, setDecryptedBody] = useState<string | undefined>(undefined);
+  const [decryptedBody, setDecryptedBody] = useState<string | undefined>(
+    undefined,
+  );
   const { orbis } = useODB();
   const { mutateAsync: upload } = useStorageUpload();
   const [poststream, setPostStream] = useState<string | undefined>(undefined);
@@ -119,7 +121,9 @@ export default function PostPage({
         const postResult = query.rows as Post[];
         if (postResult.length) {
           setMessage(postResult[0]);
-          decryptWithTACo(postResult[0].body).then(decrypted => setDecryptedBody(decrypted.toString()))
+          decryptWithTACo(postResult[0].body).then((decrypted) =>
+            setDecryptedBody(decrypted.toString()),
+          );
         }
       }
     } catch (error) {
@@ -253,7 +257,10 @@ export default function PostPage({
               </div>
             </div>
             {message.comments?.map((comment, index) => (
-              <div key={comment.stream_id || `comment-${index}`} className="relative grow">
+              <div
+                key={comment.stream_id || `comment-${index}`}
+                className="relative grow"
+              >
                 <div className="group relative grow overflow-hidden rounded-2xl border bg-background p-5 md:p-8">
                   <div
                     aria-hidden="true"
