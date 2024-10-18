@@ -23,7 +23,7 @@ Next, install your dependencies:
 
 ```bash
 nvm use 20
-npm install
+pnpm install
 ```
 
 ### Environment Setup
@@ -63,13 +63,13 @@ You are now ready to run the application.
 Running in developer mode:
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 Building:
 
 ```bash
-npm run build
+pnpm build
 ```
 
 ## Learn More
