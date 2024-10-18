@@ -8,8 +8,9 @@ import {
 import {
   OrbisDB,
   type OrbisConnectResult,
-  type SiwxAttestation,
 } from "@useorbis/db-sdk";
+import type { Cacao } from '@didtools/cacao';
+import { env } from "@/env.mjs";
 import { OrbisEVMAuth } from "@useorbis/db-sdk/auth";
 import { useWalletClient, useAccount, useAccountEffect } from "wagmi";
 
@@ -17,7 +18,7 @@ type OrbisDBProps = {
   children: ReactNode;
 };
 
-const ENV_ID = process.env.NEXT_PUBLIC_ENV_ID ?? "";
+const ENV_ID = env.NEXT_PUBLIC_ENV_ID ?? "";
 
 declare global {
   interface Window {
@@ -59,13 +60,13 @@ export const ODB = ({ children }: OrbisDBProps) => {
       const StartOrbisAuth = async (): Promise<
         OrbisConnectResult | undefined
       > => {
-        const auth = new OrbisEVMAuth(window.ethereum!);
+        const auth = new OrbisEVMAuth(window.ethereum);
         // Authenticate - this option persists the session in local storage
         const authResult: OrbisConnectResult = await orbis.connectUser({
           auth,
         });
-        if (authResult.session) {
-          console.log("Orbis Auth'd:", authResult.session);
+        if (authResult.auth.session) {
+          console.log("Orbis Auth'd:", authResult.auth.session);
           return authResult;
         }
 
@@ -76,14 +77,13 @@ export const ODB = ({ children }: OrbisDBProps) => {
       if (walletClient) {
         const address = walletClient.account.address;
         if (localStorage.getItem("orbis:session") && address) {
-          const attestation = (
-            JSON.parse(
-              localStorage.getItem("orbis:session") ?? "{}",
-            ) as OrbisConnectResult
-          ).session.authAttestation as SiwxAttestation;
-          const expTime = attestation.siwx.message.expirationTime;
+          const serializedAttestation = localStorage.getItem("orbis:session") ?? "";
+          const {cacao} = JSON.parse(Buffer.from(serializedAttestation, "base64").toString()) as {cacao: Cacao};
+          console.log("Parsed Session:", cacao);
+          const expTime = cacao.p.exp;
+          const attestationAddress = cacao.p.iss.replace("did:pkh:eip155:1:", "").toLowerCase();
           if (
-            attestation.siwx.message.address.toLowerCase() !==
+            attestationAddress !==
             address.toLowerCase()
           ) {
             console.log("Address mismatch, removing session");

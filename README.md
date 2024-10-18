@@ -22,7 +22,8 @@ git clone https://github.com/ceramicstudio/deforum && cd deforum
 Next, install your dependencies:
 
 ```bash
-pnpm install
+nvm use 20
+npm install
 ```
 
 ### Environment Setup
@@ -62,13 +63,13 @@ You are now ready to run the application.
 Running in developer mode:
 
 ```bash
-pnpm dev
+npm run dev
 ```
 
 Building:
 
 ```bash
-pnpm build
+npm run build
 ```
 
 ## Learn More
