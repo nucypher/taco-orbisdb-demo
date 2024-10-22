@@ -1,20 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ethers } from "ethers";
-import { Post, Profile } from "@/types";
-import { MediaRenderer, useStorageUpload } from "@thirdweb-dev/react";
-import TextareaAutosize from "react-textarea-autosize";
-import { useAccount } from "wagmi";
-
-import { env } from "@/env.mjs";
-import { Button } from "@/components/ui/button";
-import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { useODB } from "@/app/context/OrbisContext";
 import useTaco from "@/app/hooks/useTaco";
+import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
+import { Button } from "@/components/ui/button";
+import { env } from "@/env.mjs";
+import { Post, Profile } from "@/types";
 import { conditions } from "@nucypher/taco";
+import { MediaRenderer, useStorageUpload } from "@thirdweb-dev/react";
+import { ethers } from "ethers";
+import Image from "next/image";
+import Link from "next/link";
+import React, { useEffect, useState } from "react";
+import TextareaAutosize from "react-textarea-autosize";
+import { useAccount } from "wagmi";
 
 const CONTEXT_ID = env.NEXT_PUBLIC_CONTEXT_ID ?? "";
 const POST_ID = env.NEXT_PUBLIC_POST_ID ?? "";
