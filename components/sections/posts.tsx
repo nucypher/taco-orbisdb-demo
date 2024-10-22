@@ -30,7 +30,6 @@ export default function Posts() {
       return;
     }
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
     try {
       const user = await orbis.getConnectedUser();
       if (user) {
@@ -52,16 +51,14 @@ export default function Posts() {
         if (queryResult.length) {
           // Decrypting posts with TACo
           queryResult.forEach((post) => {
-            decryptWithTACo(post.body, provider, signer).then(
-              (decryptedBody) => {
-                if (decryptedBody) {
-                  setDecryptedBodies((prev) => ({
-                    ...prev,
-                    [post.stream_id]: decryptedBody.toString(),
-                  }));
-                }
-              },
-            );
+            decryptWithTACo(post.body, provider).then((decryptedBody) => {
+              if (decryptedBody) {
+                setDecryptedBodies((prev) => ({
+                  ...prev,
+                  [post.stream_id]: decryptedBody.toString(),
+                }));
+              }
+            });
           });
 
           setPosts(queryResult.slice(0, 10));

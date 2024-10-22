@@ -94,7 +94,6 @@ export default function PostPage({
       return;
     }
     const provider = new ethers.providers.Web3Provider(window.ethereum);
-    const signer = provider.getSigner();
 
     try {
       setPostStream(stream_id);
@@ -134,13 +133,11 @@ export default function PostPage({
         setMessage(postResult[0]);
         // Decrypt the post with TACo
 
-        decryptWithTACo(postResult[0].body, provider, signer).then(
-          (decrypted) => {
-            if (decrypted) {
-              setDecryptedBody(decrypted.toString());
-            }
-          },
-        );
+        decryptWithTACo(postResult[0].body, provider).then((decrypted) => {
+          if (decrypted) {
+            setDecryptedBody(decrypted.toString());
+          }
+        });
       }
     } catch (error) {
       console.error(error);
