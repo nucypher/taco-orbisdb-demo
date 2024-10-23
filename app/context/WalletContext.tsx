@@ -1,20 +1,20 @@
-import "@rainbow-me/rainbowkit/styles.css";
+import { env } from "@/env.mjs";
 import {
+  darkTheme,
   getDefaultConfig,
   RainbowKitProvider,
-  darkTheme,
 } from "@rainbow-me/rainbowkit";
-import { env } from "@/env.mjs";
-import { WagmiProvider } from "wagmi";
-import { polygonAmoy, sepolia } from "wagmi/chains";
+import "@rainbow-me/rainbowkit/styles.css";
 import React, { ReactNode } from "react";
+import { WagmiProvider } from "wagmi";
+import { polygonAmoy } from "wagmi/chains";
 
 const projectId = env.NEXT_PUBLIC_PROJECT_ID || "";
 
 const config = getDefaultConfig({
   appName: "test-app",
   projectId,
-  chains: [polygonAmoy, sepolia],
+  chains: [polygonAmoy],
   ssr: true,
 });
 
