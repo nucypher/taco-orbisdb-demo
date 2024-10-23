@@ -56,7 +56,7 @@ export function PostModules() {
       }
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 
@@ -132,7 +132,7 @@ export function PostModules() {
       }
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 

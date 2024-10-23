@@ -80,7 +80,7 @@ export default function PostPage({
       setCommentFile(undefined);
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 
@@ -137,7 +137,7 @@ export default function PostPage({
       }
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 
