@@ -67,7 +67,7 @@ export default function Posts() {
       }
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 
