@@ -16,7 +16,8 @@ export const env = createEnv({
     NEXT_PUBLIC_PROFILE_ID: z.string().min(1),
     NEXT_PUBLIC_CONTEXT_ID: z.string().min(1),
     NEXT_PUBLIC_APP_URL: z.string().url(),
-
+    NEXT_PUBLIC_TACO_RITUAL_ID: z.string().min(1),
+    NEXT_PUBLIC_TACO_DOMAIN: z.enum(["lynx", "tapir", "mainnet"]),
   },
   runtimeEnv: {
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
@@ -28,5 +29,7 @@ export const env = createEnv({
     NEXT_PUBLIC_APP_URL: process.env.NEXT_PUBLIC_APP_URL,
     NEXT_PUBLIC_PROJECT_ID: process.env.NEXT_PUBLIC_PROJECT_ID,
     NEXT_PUBLIC_ENV_ID: process.env.NEXT_PUBLIC_ENV_ID,
+    NEXT_PUBLIC_TACO_RITUAL_ID: process.env.NEXT_PUBLIC_TACO_RITUAL_ID,
+    NEXT_PUBLIC_TACO_DOMAIN: process.env.NEXT_PUBLIC_TACO_DOMAIN,
   },
 });

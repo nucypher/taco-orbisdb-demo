@@ -2,6 +2,8 @@
 
 A web forum demo application built on OrbisDB and utilising TACo for encrypting posts and managing who has access to them.
 
+![deforum screenshot](./public/forum.png)
+
 ## Introduction
 
 This application emulates a web forum, complete with posts, comments, images, and personal profiles. It relies on the following items:
