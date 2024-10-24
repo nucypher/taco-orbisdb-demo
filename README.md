@@ -1,6 +1,6 @@
 # DeForum - A Web Forum on OrbisDB
 
-A web forum demo application built on OrbisDB.
+A web forum demo application built on OrbisDB, leveraging TACo to create non-public posts with pre-specified conditions for access. 
 
 ![deforum screenshot](./public/forum.png)
 
@@ -9,6 +9,7 @@ A web forum demo application built on OrbisDB.
 This application emulates a web forum, complete with posts, comments, images, and personal profiles. It relies on the following items:
 
 **OrbisDB on Ceramic** - A decentralized database to hold the various forum artifacts users create (such as posts, comments, etc.)
+**TACo** - A decentralized access control layer, through which decryption rights to non-public forum content (posts, comments, reactions, etc.) are verified and enforced by a decentralized cohort of TACo nodes. 
 **ThirdWeb SDK** - Uses their IPFS upload feature for image file storage
 
 ## Installation
@@ -16,7 +17,7 @@ This application emulates a web forum, complete with posts, comments, images, an
 First, create a local clone of the application:
 
 ```bash
-git clone https://github.com/ceramicstudio/deforum && cd deforum
+git clone https://github.com/nucypher/taco-orbisdb-demo && cd taco-orbisdb-demo
 ```
 
 Next, install your dependencies:
@@ -52,7 +53,7 @@ Once signed in, the studio will default to the "Contexts" tab at the top. On the
 
 Next, set up a context. These help developers segment their data models and usage based on the applications they are meant for. Create a new context (you can call it "forum-app" if you'd like), and assign the resulting string to `CONTEXT_ID` in your .env file.
 
-Finally, you will create three tables using the OrbisDB model builder feature that this application will use for storing user data. 
+Finally, you will create three tables using the OrbisDB model builder feature that this application will use for storing user data.
 
 In your Orbis Studio view, select the "Model Builder" tab at the top and create a new model named "profile" using the profile definition in [this document](models/tables.sql). Once created, assign the resulting identifier to `NEXT_PUBLIC_PROFILE_ID`. Do the same for comment --> `NEXT_PUBLIC_COMMENT_ID` and post --> `NEXT_PUBLIC_POST_ID`.
 

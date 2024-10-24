@@ -1,21 +1,19 @@
 "use client";
 
-import Image from "next/image";
-import { type Post } from "@/types";
-import { MediaRenderer, useStorageUpload } from "@thirdweb-dev/react";
-import TextareaAutosize from "react-textarea-autosize";
-
+import { useODB } from "@/app/context/OrbisContext";
+import useTaco from "@/app/hooks/useTaco";
+import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
 import { Button } from "@/components/ui/button";
-
-import "@/styles/mdx.css";
-
-import { useEffect, useState } from "react";
-import Link from "next/link";
-
 import { env } from "@/env.mjs";
 import { formatDate } from "@/lib/utils";
-import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
-import { useODB } from "@/app/context/OrbisContext";
+import "@/styles/mdx.css";
+import { type Post } from "@/types";
+import { MediaRenderer, useStorageUpload } from "@thirdweb-dev/react";
+import { ethers } from "ethers";
+import Image from "next/image";
+import Link from "next/link";
+import { useEffect, useState } from "react";
+import TextareaAutosize from "react-textarea-autosize";
 
 const CONTEXT_ID = env.NEXT_PUBLIC_CONTEXT_ID ?? "";
 const COMMENT_ID = env.NEXT_PUBLIC_COMMENT_ID ?? "";
@@ -28,11 +26,16 @@ export default function PostPage({
   };
 }) {
   const [message, setMessage] = useState<Post | undefined>(undefined);
+  const [decryptedBody, setDecryptedBody] = useState<string | undefined>(
+    undefined,
+  );
   const { orbis } = useODB();
   const { mutateAsync: upload } = useStorageUpload();
   const [poststream, setPostStream] = useState<string | undefined>(undefined);
   const [comment, setComment] = useState<string | undefined>(undefined);
   const [commentFile, setCommentFile] = useState<File | undefined>(undefined);
+
+  const { isInitialized, decryptWithTACo } = useTaco();
 
   const uploadToIpfs = async () => {
     const uploadUrl = await upload({
@@ -70,7 +73,6 @@ export default function PostPage({
         console.log(updatequery);
 
         if (updatequery.content) {
-          alert("Created Comment.");
           await getPost(poststream!);
         }
       }
@@ -78,56 +80,70 @@ export default function PostPage({
       setCommentFile(undefined);
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 
   const getPost = async (stream_id: string): Promise<void> => {
+    if (!window.ethereum) {
+      console.error("No Ethereum provider found");
+      return;
+    }
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+
     try {
       setPostStream(stream_id);
       const user = await orbis.getConnectedUser();
-      if (user) {
-        console.log(stream_id);
-        const query = await orbis
-          .select()
-          .raw(
-            `
-            SELECT
-              *,
-              (
-                SELECT json_build_object( 'name', name, 'username', username, 'description', description, 'profile_imageid', profile_imageid, 'stream_id', stream_id)
-                FROM ${env.NEXT_PUBLIC_PROFILE_ID} as profile
-                WHERE profile.controller = post.controller
-              ) as profile,
-              (
-                SELECT json_agg(json_build_object('comment', comment, 'imageid', imageid,
-                'profile', (SELECT json_build_object( 'name', name, 'username', username, 'description', description, 'profile_imageid', profile_imageid, 'stream_id', stream_id)
-                FROM ${env.NEXT_PUBLIC_PROFILE_ID} as profile
-                WHERE profile.controller = comment.controller)
-                ))
-                FROM ${env.NEXT_PUBLIC_COMMENT_ID} as comment
-                WHERE comment.poststream = post.stream_id
-              ) as comments
-              FROM ${env.NEXT_PUBLIC_POST_ID} as post
-              WHERE post.stream_id = '${stream_id}'
-            `,
-          )
-          .run();
-        console.log(query);
-        const postResult = query.rows as Post[];
-        if (postResult.length) {
-          setMessage(postResult[0]);
-        }
+      if (!user) {
+        console.error("No user found");
+        return;
+      }
+      const query = await orbis
+        .select()
+        .raw(
+          `
+          SELECT
+            *,
+            (
+              SELECT json_build_object( 'name', name, 'username', username, 'description', description, 'profile_imageid', profile_imageid, 'stream_id', stream_id)
+              FROM ${env.NEXT_PUBLIC_PROFILE_ID} as profile
+              WHERE profile.controller = post.controller
+            ) as profile,
+            (
+              SELECT json_agg(json_build_object('comment', comment, 'imageid', imageid,
+              'profile', (SELECT json_build_object( 'name', name, 'username', username, 'description', description, 'profile_imageid', profile_imageid, 'stream_id', stream_id)
+              FROM ${env.NEXT_PUBLIC_PROFILE_ID} as profile
+              WHERE profile.controller = comment.controller)
+              ))
+              FROM ${env.NEXT_PUBLIC_COMMENT_ID} as comment
+              WHERE comment.poststream = post.stream_id
+            ) as comments
+            FROM ${env.NEXT_PUBLIC_POST_ID} as post
+            WHERE post.stream_id = '${stream_id}'
+          `,
+        )
+        .run();
+
+      const postResult = query.rows as Post[];
+      if (postResult.length) {
+        setMessage(postResult[0]);
+        // Decrypt the post with TACo
+
+        decryptWithTACo(postResult[0].body, provider).then((decrypted) => {
+          if (decrypted) {
+            setDecryptedBody(decrypted.toString());
+          }
+        });
       }
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 
   useEffect(() => {
     void getPost(params.slug);
-  }, [params.slug]);
+  }, [params.slug, isInitialized]);
 
   return (
     <>
@@ -168,7 +184,7 @@ export default function PostPage({
               </div>
             )}
             <p className="text-base text-muted-foreground md:text-lg">
-              {message.body}
+              {decryptedBody || "<Hidden content>"}
             </p>
             <div className="mt-12 grid gap-5 bg-inherit lg:grid-cols-1">
               <div className="relative flex w-full items-center justify-center">
@@ -250,7 +266,10 @@ export default function PostPage({
               </div>
             </div>
             {message.comments?.map((comment, index) => (
-              <div key={comment.stream_id || `comment-${index}`} className="relative grow">
+              <div
+                key={comment.stream_id || `comment-${index}`}
+                className="relative grow"
+              >
                 <div className="group relative grow overflow-hidden rounded-2xl border bg-background p-5 md:p-8">
                   <div
                     aria-hidden="true"

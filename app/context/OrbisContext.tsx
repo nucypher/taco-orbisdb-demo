@@ -70,7 +70,7 @@ export const ODB = ({ children }: OrbisDBProps) => {
           return authResult;
         }
 
-        return undefined;
+        return;
       };
 
       // Only run this if the wallet client is available

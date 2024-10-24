@@ -1,17 +1,19 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import { useODB } from "@/app/context/OrbisContext";
+import useTaco from "@/app/hooks/useTaco";
+import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
+import { Button } from "@/components/ui/button";
+import { env } from "@/env.mjs";
+import { Post, Profile } from "@/types";
+import { conditions } from "@nucypher/taco";
+import { MediaRenderer, useStorageUpload } from "@thirdweb-dev/react";
+import { ethers } from "ethers";
 import Image from "next/image";
 import Link from "next/link";
-import { Post, Profile } from "@/types";
-import { MediaRenderer, useStorageUpload } from "@thirdweb-dev/react";
+import React, { useEffect, useState } from "react";
 import TextareaAutosize from "react-textarea-autosize";
 import { useAccount } from "wagmi";
-
-import { env } from "@/env.mjs";
-import { Button } from "@/components/ui/button";
-import MaxWidthWrapper from "@/components/shared/max-width-wrapper";
-import { useODB } from "@/app/context/OrbisContext";
 
 const CONTEXT_ID = env.NEXT_PUBLIC_CONTEXT_ID ?? "";
 const POST_ID = env.NEXT_PUBLIC_POST_ID ?? "";
@@ -26,6 +28,8 @@ export function PostModules() {
   const [profile, setProfile] = useState<Profile | undefined>(undefined);
   const { orbis } = useODB();
   const { address } = useAccount();
+
+  const { isInitialized, encryptWithTACo } = useTaco();
 
   const uploadToIpfs = async () => {
     const uploadUrl = await upload({
@@ -45,7 +49,6 @@ export function PostModules() {
           .where({ controller: user.user.did.toLowerCase() })
           .context(CONTEXT_ID);
         const profileResult = await profile.run();
-        console.log(profileResult);
         if (profileResult.rows.length) {
           profileResult.rows[0].imageId = profileResult.rows[0].imageid;
           setProfile(profileResult.rows[0] as Profile);
@@ -53,52 +56,83 @@ export function PostModules() {
       }
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 
   const createPost = async (): Promise<void> => {
+    if (!window.ethereum) {
+      console.error("No Ethereum provider found");
+      return;
+    }
+    const provider = new ethers.providers.Web3Provider(window.ethereum);
+    const signer = provider.getSigner();
+
     try {
       if (!title || !body) {
         alert("Please fill in the title and body of the post.");
         return;
       }
       const user = await orbis.getConnectedUser();
-      if (user) {
-        let imageUrl;
-        if (file) {
-          imageUrl = await uploadToIpfs();
-        }
+      if (!user) {
+        alert("Please connect your wallet to create a post.");
+        return;
+      }
+      let imageUrl;
+      if (file) {
+        imageUrl = await uploadToIpfs();
+      }
 
-        const created = new Date().toISOString();
-        const createQuery = await orbis
-          .insert(POST_ID)
-          .value({
-            title,
-            body,
-            imageid: imageUrl ? imageUrl : "",
-            created,
-          })
-          .context(CONTEXT_ID)
-          .run();
+      if (!provider || !signer) {
+        console.error("No web3 provider or signer loaded");
+        return;
+      }
 
-        console.log(createQuery);
+      // define TACo condition to decrypt the body of the post
+      const condition = new conditions.base.rpc.RpcCondition({
+        chain: 80002,
+        method: "eth_getBalance",
+        parameters: [":userAddressExternalEIP4361"],
+        returnValueTest: {
+          comparator: ">",
+          value: 0,
+        },
+      });
 
-        if (createQuery.content) {
-          console.log("Post created successfully");
-          setPost({
-            title,
-            body,
-            imageid: imageUrl ? imageUrl : "",
-            stream_id: createQuery.content.stream_id,
-            profile,
-            created,
-          });
-        }
+      // encrypt post with TACO
+      const encryptedBody = await encryptWithTACo(
+        body,
+        condition,
+        provider,
+        signer,
+      );
+
+      const created = new Date().toISOString();
+      const createQuery = await orbis
+        .insert(POST_ID)
+        .value({
+          title,
+          body: encryptedBody,
+          imageid: imageUrl ? imageUrl : "",
+          created,
+        })
+        .context(CONTEXT_ID)
+        .run();
+
+      if (createQuery.content) {
+        console.log("Post created successfully");
+        setPost({
+          title,
+          body,
+          imageid: imageUrl ? imageUrl : "",
+          stream_id: createQuery.content.stream_id,
+          profile,
+          created,
+        });
       }
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 
@@ -163,6 +197,7 @@ export function PostModules() {
                   </div>
                   <div className="flex items-center justify-between border-t px-3 py-2 dark:border-gray-600">
                     <Button
+                      disabled={!isInitialized}
                       variant={"default"}
                       className="inline-flex items-center rounded-lg bg-blue-700 px-4 py-2.5 text-center text-xs font-medium text-white hover:bg-blue-800 focus:ring-4 focus:ring-blue-200 dark:focus:ring-blue-900"
                       rounded="full"

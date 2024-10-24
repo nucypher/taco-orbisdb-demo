@@ -50,7 +50,7 @@ export default function PostPage({
       }
     } catch (error) {
       console.error(error);
-      return undefined;
+      return;
     }
   };
 
