@@ -1,6 +1,6 @@
 # DeForum - A Web Forum on OrbisDB
 
-A web forum demo application built on OrbisDB and utilising TACo for encrypting posts and managing who has access to them.
+A web forum demo application built on OrbisDB, leveraging TACo to create non-public posts with pre-specified conditions for access. 
 
 ![deforum screenshot](./public/forum.png)
 
