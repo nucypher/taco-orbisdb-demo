@@ -46,7 +46,7 @@ export default function useTaco() {
     const siweInfo = await loadSiweFromOrbisSession();
     if (!siweInfo.message || !siweInfo.signature) {
       console.error("SIWE message or signature missing");
-      return "<Decryption failed>";
+      return "<Decryption failed. This may be because the user has not yet logged in.>";
     }
     const authProvider =
       await SingleSignOnEIP4361AuthProvider.fromExistingSiweInfo(
